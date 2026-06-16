@@ -1,0 +1,48 @@
+---
+name: "Update node-driver-registrar version"
+
+sources:
+  upstream:
+    name: Get node-driver-registrar version
+    kind: githubrelease
+    spec:
+      owner: kubernetes-csi
+      repository: node-driver-registrar
+      token: '{{ requiredEnv .github.token }}'
+      typefilter:
+        release: true
+        draft: false
+        prerelease: false
+      versionfilter:
+        kind: semver
+
+targets:
+  makefile:
+    name: "Bump to latest node-driver-registrar version in Makefile"
+    kind: file
+    scmid: default
+    disablesourceinput: true
+    spec:
+      file: Makefile
+      matchpattern: '(?m)^TAG \:\= (.*)'
+      replacepattern: 'TAG := {{ source "upstream" }}$$(BUILD_META)'
+
+scms:
+  default:
+    kind: github
+    spec:
+      token: '{{ requiredEnv .github.token }}'
+      username: '{{ .github.username }}'
+      user: '{{ .github.username }}'
+      email: '{{ .github.email }}'
+      owner: '{{ .github.owner }}'
+      repository: '{{ .github.repository }}'
+      branch: '{{ .github.branch }}'
+
+actions:
+  default:
+    title: 'Bump node-driver-registrar version to {{ source "upstream" }}'
+    kind: github/pullrequest
+    spec:
+      automerge: false
+    scmid: default
