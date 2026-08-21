@@ -48,12 +48,6 @@ push-image-csi-node-driver-registrar:
 		--push \
 		.
 
-.PHONY: build-image-all
-build-image-all: build-image-csi-node-driver-registrar
-
-.PHONY: push-image-all
-push-image-all: push-image-csi-node-driver-registrar
-
 .PHONY: image-scan
 image-scan:
 	trivy image --severity $(SEVERITIES) --no-progress --ignore-unfixed $(REPO)/hardened-csi-node-driver-registrar:$(TAG)
