@@ -2,12 +2,12 @@
 name: "Update node-driver-registrar version"
 
 sources:
-  upstream:
-    name: Get node-driver-registrar version
+  vsphere-csi-driver:
+    name: Get latest vsphere-csi-driver version
     kind: githubrelease
     spec:
-      owner: kubernetes-csi
-      repository: node-driver-registrar
+      owner: kubernetes-sigs
+      repository: vsphere-csi-driver
       token: '{{ requiredEnv .github.token }}'
       typefilter:
         release: true
@@ -16,16 +16,25 @@ sources:
       versionfilter:
         kind: semver
 
+  node-driver-registrar:
+    name: Get node-driver-registrar version from vsphere-csi-driver manifest
+    kind: file
+    spec:
+      file: 'https://raw.githubusercontent.com/kubernetes-sigs/vsphere-csi-driver/{{ source "vsphere-csi-driver" }}/manifests/vanilla/vsphere-csi-driver.yaml'
+      matchpattern: 'registry\.k8s\.io/sig-storage/csi-node-driver-registrar:(v[0-9]+\.[0-9]+\.[0-9]+)'
+      replacepattern: '$1'
+
 targets:
   tagfile:
-    name: "Bump to latest node-driver-registrar version in TAG"
+    name: "Bump to node-driver-registrar version used by vsphere-csi-driver in TAG"
     kind: file
+    sourceid: node-driver-registrar
     scmid: default
     disablesourceinput: true
     spec:
       file: TAG
       matchpattern: '(?m)^(.+)$'
-      replacepattern: '{{ source "upstream" }}'
+      replacepattern: '{{ source "node-driver-registrar" }}'
 
 scms:
   default:
@@ -41,7 +50,7 @@ scms:
 
 actions:
   default:
-    title: 'Bump node-driver-registrar version to {{ source "upstream" }}'
+    title: 'Bump node-driver-registrar version to {{ source "node-driver-registrar" }}'
     kind: github/pullrequest
     spec:
       merge:
