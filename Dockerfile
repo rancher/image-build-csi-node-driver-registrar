@@ -33,6 +33,5 @@ RUN if [ "$(xx-info arch)" = "amd64" ]; then \
 # CSI Node Driver Registrar Sidecar
 FROM ${BCI_IMAGE} AS csi-node-driver-registrar
 LABEL org.opencontainers.image.description="CSI Node Driver Registrar Sidecar"
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/local/bin/csi-node-driver-registrar /csi-node-driver-registrar
 ENTRYPOINT ["/csi-node-driver-registrar"]
